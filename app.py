@@ -1,4 +1,4 @@
-import os
+
 from datetime import datetime
 import aiohttp
 import asyncio
@@ -10,7 +10,7 @@ app = Flask(__name__)
 SUPPORTED_URLS = {'streeteasy.com', 'zillow.com', 'renthop.com'}
 
 
-def extract_base_url(url):
+def extract_base_url(url: str) -> str or None:
     pattern = r"(?:https?://)?(?:www\.)?([^/]+\.com)"
     match = re.match(pattern, url)
     if match:
@@ -19,7 +19,7 @@ def extract_base_url(url):
     return None
 
 
-def is_supported_url(url):
+def is_supported_url(url: str) -> bool:
     base_url = extract_base_url(url)
     if base_url is not None:
         for supported_url in SUPPORTED_URLS:
@@ -36,20 +36,6 @@ def get_listing_url():
     if not is_supported_url(listing_url):
         raise ValueError('Unsupported URL provided. Supported URLs: {}'.format(SUPPORTED_URLS))
     return listing_url
-
-async def get_neighborhood_from_address(address, api_key):
-    url = f'https://api.opencagedata.com/geocode/v1/json?q={address}&key={os.getenv("GOOGLE_V3_API_KEY")}'
-
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            data = await response.json()
-
-            if 'results' in data and len(data['results']) > 0:
-                components = data['results'][0]['components']
-                neighborhood = components.get('neighbourhood')
-                return neighborhood
-
-            return None
 
 
 async def fetch_listing_data(listing_url):
@@ -137,8 +123,6 @@ def extract_attributes(html_text, listing_url: str):
 
     except Exception as e:
         raise Exception('Error parsing with BeautifulSoup: {}'.format(str(e)))
-
-
 
 
 @app.route('/')
