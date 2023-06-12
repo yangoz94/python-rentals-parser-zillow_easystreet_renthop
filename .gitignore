@@ -12,6 +12,8 @@ pyvenv.cfg
 .venv
 venv
 .git
+.DS_Store
+.idea
 pip-selfcheck.json
 
 ### Python template
