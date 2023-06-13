@@ -83,7 +83,7 @@ class ListingParser:
                 address_raw = summary_container.find_all('h1')[0].text.strip()
                 address = re.sub(r',([^,]+,[^,]+)$', '', address_raw) if address_raw else None
 
-                number_of_rooms_elements = summary_container.find_all('strong')
+                number_of_rooms_elements = summary_container.find_all('strong') if summary_container else None
                 if number_of_rooms_elements:
                     number_of_rooms = number_of_rooms_elements[0].text.strip()
 
