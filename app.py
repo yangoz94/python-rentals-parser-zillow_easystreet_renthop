@@ -1,9 +1,8 @@
 import asyncio
 from flask import Flask, request, jsonify, Response
-from model import ListingParser
+from model import ListingParser, SheetsAPI
 
 app = Flask(__name__)
-
 
 
 @app.route('/')
@@ -24,24 +23,31 @@ def parse_listing():
         url = data['url'].strip()
         listing_parser = ListingParser(url)
         if not listing_parser.is_supported_url():
-            raise ValueError('Unsupported URL provided. Supported URLs: {}'.format(SUPPORTED_URLS))
+            raise ValueError('Unsupported URL provided. Supported URLs: {}'.format(listing_parser.SUPPORTED_URLS))
 
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         listing_data = loop.run_until_complete(listing_parser.fetch_listing_data())
         attributes = listing_parser.extract_attributes(listing_data)
 
-        response = {
-            'url': url,
-            'address': attributes[0],
-            'neighborhood': attributes[1],
-            'number_of_rooms': attributes[2],
-            'price': attributes[3],
-            'description': attributes[4],
-            'available_on': attributes[5]
-        }
+        new_row_to_append = [
+            url,
+            attributes['address'],
+            attributes['neighborhood'],
+            attributes['number_of_rooms'],
+            attributes['price'],
+            attributes['available_on'],
+            "",  # placeholder for notes column in google sheets that I want to leave blank
+            attributes['description'],
+        ]
 
-        return jsonify(response)
+        # add newly parsed data to google sheets
+        sheets_api = SheetsAPI()
+        is_row_added = sheets_api.add_new_row(new_row_to_append)
+        if not is_row_added:
+            raise ValueError('Failed to add new row to Google Sheets')
+
+        return jsonify(attributes)
 
     except ValueError as ve:
         return Response(status=400, response=str(ve))

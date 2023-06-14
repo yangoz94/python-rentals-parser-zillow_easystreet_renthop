@@ -15,7 +15,12 @@ venv
 .DS_Store
 .idea
 pip-selfcheck.json
-
+../credentials.json
+../token.json
+creds/credentials.json
+creds/token.json
+*.json
+```
 ### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/
