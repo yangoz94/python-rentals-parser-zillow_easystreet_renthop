@@ -13,7 +13,6 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 load_dotenv()
-SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 
 class ListingParser:
@@ -58,31 +57,36 @@ class ListingParser:
 
         try:
             soup = BeautifulSoup(html_text, 'html.parser')
-
             if "streeteasy.com" in self.url:
                 address_element = soup.find('h1', {'class': 'building-title'})
-                address = address_element.text.strip() if address_element else None
+                if address_element:
+                    address = address_element.text.strip()
 
                 number_of_rooms_elements = soup.findAll('li', {'class': 'detail_cell'})
-                number_of_rooms = number_of_rooms_elements[1].text.strip()[0] + 'BR' if number_of_rooms_elements else None
+                if len(number_of_rooms_elements) >= 2:
+                    number_of_rooms = number_of_rooms_elements[1].text.strip()[0] + 'BR'
 
                 price_element = soup.find('div', {'class': 'price'})
-                price_text = price_element.text.strip() if price_element else None
-                price_pattern = r"\$(\d{1,3}(?:,\d{3})*)(?:\.\d{2})?"
-                match = re.search(price_pattern, price_text)
-                price = match.group(1) if match else None
+                if price_element:
+                    price_text = price_element.text.strip()
+                    price_pattern = r"\$(\d{1,3}(?:,\d{3})*)(?:\.\d{2})?"
+                    match = re.search(price_pattern, price_text)
+                    price = match.group(1) if match else None
 
                 description_element = soup.find('div', {'id': 'full-content'})
-                description = description_element.text.strip().replace('\n', ' ') if description_element else None
+                if description_element:
+                    description = description_element.text.strip().replace('\n', ' ')
 
                 neighborhood_elements = soup.find('ul', {'class': 'Breadcrumb Breadcrumb--detailsPage'}).find_all('li')
-                neighborhood = neighborhood_elements[2].text.strip() if len(neighborhood_elements) >= 3 else None
+                if len(neighborhood_elements) >= 3:
+                    neighborhood = neighborhood_elements[2].text.strip()
 
                 available_on_element = soup.find('div', {'class': 'Vitals-data'})
                 if available_on_element:
                     if available_on_element.text.strip() == "Available Now":
                         available_on = "Available Immediately"
                     else:
+
                         available_on = datetime.strptime(
                             available_on_element.text.strip(), "%m/%d/%Y"
                         ).strftime("%a %b %d %Y")
@@ -103,35 +107,49 @@ class ListingParser:
 
                 if data_view_container:
                     description_overview = data_view_container.find('h4', string='Overview')
-                    description_raw = description_overview.find_next_sibling('div').text.strip() if description_overview else None
-                    description = re.sub(
+
+                    if description_overview:
+                        description_raw = description_overview.find_next_sibling('div').text.strip()
+
+                        description = re.sub(
+
                             r"Show more.*$", "", description_raw, flags=re.MULTILINE
-                        ).replace('\n', ' ').replace("Hide", "").strip() if description_raw else None
+
+                        ).replace('\n', ' ').replace("Hide", "").strip()
 
                     available_on_element = data_view_container.find('span', string="Date available")
-                    available_on = available_on_element.find_next_sibling('span').text.strip() if available_on_element else "Not Specified"
+                    if available_on_element:
+                        available_on = available_on_element.find_next_sibling('span').text.strip()
+                    else:
+                        available_on = "Not specified"
 
             elif "renthop.com" in self.url:
                 address_element = soup.find('h1', {'class': 'font-size-16 b overflow-ellipsis'})
-                address = address_element.find('a').text.strip() if address_element else None
+                if address_element:
+                    address = address_element.find('a').text.strip() if address_element.find('a') else None
 
                 number_of_rooms_element = soup.find('div', {'style': 'margin-left: 4px;'})
-                number_of_rooms = number_of_rooms_element.text.strip().replace(' Bed', 'BR').replace('\n',"") if number_of_rooms_element.text.strip() else None
+                if number_of_rooms_element is not None:
+                    number_of_rooms = number_of_rooms_element.text.strip().replace(' Bed', 'BR').replace('\n',"") if number_of_rooms_element.text.strip() else None
 
                 price_element = soup.find('span', {'class': 'listing-details-price b'})
-                price = price_element.text.strip().replace('$', '') if price_element.text.strip() else None
+                if price_element is not None:
+                    price = price_element.text.strip().replace('$', '') if price_element.text.strip() else None
 
                 description_element = soup.find('div', {'class': 'b font-size-12'})
-                description = description_element \
+                if description_element is not None:
+                    description = description_element \
                         .findNextSibling('div') \
                         .findNextSibling('div') \
-                        .text.strip().replace('\n', ' ') if description_element else None
+                        .text.strip().replace('\n', ' ')
 
                 neighborhood_element = soup.find('div', {'class': 'overflow-ellipsis font-size-9'})
-                neighborhood = neighborhood_element.text.strip().split(',')[0] if neighborhood_element else None
+                if neighborhood_element is not None:
+                    neighborhood = neighborhood_element.text.strip().split(',')[0]
 
                 available_on_raw = soup.find('div', {'class': 'font-size-9', 'style': 'margin-top: 5px;'})
-                available_on = self.extract_renthop_availability(available_on_raw.text.strip()) if available_on_raw else None
+                if available_on_raw is not None:
+                    available_on = self.extract_renthop_availability(available_on_raw.text.strip())
 
             return {
                 'address': address,
@@ -155,24 +173,26 @@ class ListingParser:
 
 
 class SheetsAPI:
+    SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+
     def __init__(self):
         self.creds = None
-        self.spreadsheet_id = os.environ['SAMPLE_SPREADSHEET_ID']
-        self.range_name = os.environ['SAMPLE_RANGE_NAME']
+        self.spreadsheet_id = os.environ['SPREADSHEET_ID']
+        self.range_name = os.environ['RANGE_NAME']
         self.authenticate()
 
     def authenticate(self):
         if os.path.exists('creds/token.json'):
-            self.creds = Credentials.from_authorized_user_file('creds/token.json', SCOPES)
+            self.creds = Credentials.from_authorized_user_file('creds/token.json', self.SCOPES)
 
         if not self.creds or not self.creds.valid:
             if self.creds and self.creds.expired and self.creds.refresh_token:
                 self.creds.refresh(Request())
             else:
-                flow = InstalledAppFlow.from_client_secrets_file('creds/credentials.json', SCOPES)
+                flow = InstalledAppFlow.from_client_secrets_file('creds/credentials.json', self.SCOPES)
                 self.creds = flow.run_local_server(port=0)
 
-            with open('token.json', 'w') as token:
+            with open('creds/token.json', 'w') as token:
                 token.write(self.creds.to_json())
 
     def get_all_rows(self) -> list:
@@ -206,7 +226,7 @@ class SheetsAPI:
             if existing_rows:
                 for row in existing_rows:
                     if row[0] == new_row[0]: # row[0] is the url as the unique identifier
-                        raise Exception('Row already exists.')
+                        raise ValueError('Row already exists.')
 
             value_input_option = 'RAW'
             insert_data_option = 'INSERT_ROWS'
@@ -223,6 +243,10 @@ class SheetsAPI:
             ).execute()
 
             return True
+
+        except ValueError as err:
+            print(err)
+            return False
 
         except HttpError as err:
             print(err)

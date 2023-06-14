@@ -5,11 +5,6 @@ from model import ListingParser, SheetsAPI
 app = Flask(__name__)
 
 
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
-
-
 @app.route('/api/parse-listing', methods=['POST'])
 def parse_listing():
     try:
@@ -45,12 +40,12 @@ def parse_listing():
         sheets_api = SheetsAPI()
         is_row_added = sheets_api.add_new_row(new_row_to_append)
         if not is_row_added:
-            raise ValueError('Failed to add new row to Google Sheets')
+            raise ValueError('Error: likely because the listing URL already exists in the sheet.')
 
         return jsonify(attributes)
 
     except ValueError as ve:
-        return Response(status=400, response=str(ve))
+        return Response(status=400, response="{}".format(ve))
 
     except Exception as e:
         return Response(status=500, response='Internal Server Error: {}'.format(str(e)))

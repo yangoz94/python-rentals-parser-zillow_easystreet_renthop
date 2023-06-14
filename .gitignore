@@ -10,7 +10,8 @@
 [Ss]cripts
 pyvenv.cfg
 .venv
-venv
+*venv
+../venv
 .git
 .DS_Store
 .idea
@@ -20,6 +21,7 @@ pip-selfcheck.json
 creds/credentials.json
 creds/token.json
 *.json
+*.env
 ```
 ### Python template
 # Byte-compiled / optimized / DLL files
@@ -161,3 +163,4 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
+!/creds/token.json
