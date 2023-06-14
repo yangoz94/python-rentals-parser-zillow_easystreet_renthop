@@ -51,7 +51,7 @@ trio==0.22.0
 trio-websocket==0.10.3
 typing_extensions==4.6.3
 uritemplate==4.1.1
-urllib3==2.0.3
+urllib3==1.26.16
 Werkzeug==2.3.6
 wsproto==1.2.0
 yarl==1.9.2

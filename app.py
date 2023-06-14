@@ -1,6 +1,7 @@
 import asyncio
 from flask import Flask, request, jsonify, Response
-from model import ListingParser, SheetsAPI
+from models.ListingParser.ListingParser import ListingParser
+from models.SheetsAPI.SheetsAPI import SheetsAPI
 
 app = Flask(__name__)
 
@@ -52,4 +53,5 @@ def parse_listing():
 
 
 if __name__ == '__main__':
+    print("Starting the flask server...")
     app.run()
