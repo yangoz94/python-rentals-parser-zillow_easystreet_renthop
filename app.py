@@ -55,3 +55,4 @@ def parse_listing():
 if __name__ == '__main__':
     print("Starting the flask server...")
     app.run()
+

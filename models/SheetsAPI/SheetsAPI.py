@@ -1,13 +1,12 @@
+import json
 import os
 from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
+from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from dotenv import load_dotenv
 
 load_dotenv()
-
 
 class SheetsAPI:
     SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
@@ -19,18 +18,12 @@ class SheetsAPI:
         self.authenticate()
 
     def authenticate(self):
-        if os.path.exists('token.json'):
-            self.creds = Credentials.from_authorized_user_file('token.json', self.SCOPES)
+        # Load the service account key JSON data from an environment variable.
+        service_account_info = json.loads(os.environ['SERVICE_ACCOUNT_INFO'])
 
-        if not self.creds or not self.creds.valid:
-            if self.creds and self.creds.expired and self.creds.refresh_token:
-                self.creds.refresh(Request())
-            else:
-                flow = InstalledAppFlow.from_client_secrets_file('credentials.json', self.SCOPES)
-                self.creds = flow.run_local_server(port=0)
-
-            with open('token.json', 'w') as token:
-                token.write(self.creds.to_json())
+        # Create credentials from the service account info.
+        self.creds = service_account.Credentials.from_service_account_info(
+            service_account_info, scopes=self.SCOPES)
 
     def get_all_rows(self) -> list:
         try:
