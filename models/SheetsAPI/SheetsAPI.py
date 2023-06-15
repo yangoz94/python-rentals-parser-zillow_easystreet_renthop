@@ -19,17 +19,17 @@ class SheetsAPI:
         self.authenticate()
 
     def authenticate(self):
-        if os.path.exists('creds/token.json'):
-            self.creds = Credentials.from_authorized_user_file('creds/token.json', self.SCOPES)
+        if os.path.exists('token.json'):
+            self.creds = Credentials.from_authorized_user_file('token.json', self.SCOPES)
 
         if not self.creds or not self.creds.valid:
             if self.creds and self.creds.expired and self.creds.refresh_token:
                 self.creds.refresh(Request())
             else:
-                flow = InstalledAppFlow.from_client_secrets_file('creds/credentials.json', self.SCOPES)
+                flow = InstalledAppFlow.from_client_secrets_file('credentials.json', self.SCOPES)
                 self.creds = flow.run_local_server(port=0)
 
-            with open('creds/token.json', 'w') as token:
+            with open('token.json', 'w') as token:
                 token.write(self.creds.to_json())
 
     def get_all_rows(self) -> list:

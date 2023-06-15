@@ -22,6 +22,7 @@ credentials.json
 token.json
 *.json
 *.env
+./token.json
 ```
 ### Python template
 # Byte-compiled / optimized / DLL files
