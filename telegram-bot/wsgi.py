@@ -1,4 +1,6 @@
 from app import bot
 
 if __name__ == '__main__':
-    bot.run()
+    # Polling
+    print("Now polling...")
+    bot.run_polling(poll_interval=3)

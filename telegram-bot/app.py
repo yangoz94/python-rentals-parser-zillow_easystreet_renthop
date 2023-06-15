@@ -79,23 +79,22 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print(f"Update {update} caused error {context.error}")
 
+# NOTE: DO NOT WRAP THE FOLLOWING BLOCK WITH IF __main__ == '__main__' as it would cause an import error since
+# wsgi.py is run mainly by gunicorn Main
+print("Starting the bot...")
+bot = Application.builder().token(os.environ["TELEGRAM_API_TOKEN"]).build()
 
-# Main
-if __name__ == "__main__":
-    print("Starting the bot...")
-    bot = Application.builder().token(os.environ["TELEGRAM_API_TOKEN"]).build()
+# Commands
+bot.add_handler(CommandHandler("start", start_command))
+bot.add_handler(CommandHandler("help", help_command))
+bot.add_handler(CommandHandler("add", add_command))
 
-    # Commands
-    bot.add_handler(CommandHandler("start", start_command))
-    bot.add_handler(CommandHandler("help", help_command))
-    bot.add_handler(CommandHandler("add", add_command))
+# Messages
+bot.add_handler(MessageHandler(filters.TEXT, handle_message))
 
-    # Messages
-    bot.add_handler(MessageHandler(filters.TEXT, handle_message))
+# Errors
+bot.add_error_handler(error)
 
-    # Errors
-    bot.add_error_handler(error)
-
-    # Polling
-    print("Now polling...")
-    bot.run_polling(poll_interval=3)
+# Polling
+print("Now polling...")
+bot.run_polling(poll_interval=3)
