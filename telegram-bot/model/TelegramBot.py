@@ -7,6 +7,7 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 
 load_dotenv()
 
+
 class TelegramBot:
     def __init__(self):
         self.bot = Application.builder().token(os.environ["TELEGRAM_API_TOKEN"]).build()
@@ -90,10 +91,3 @@ class TelegramBot:
         print("Starting the bot...")
         print("Now polling...")
         self.bot.run_polling(timeout=3)
-
-if __name__ == "__main__":
-    bot = TelegramBot()
-    bot.start_the_bot()
-
-
-
