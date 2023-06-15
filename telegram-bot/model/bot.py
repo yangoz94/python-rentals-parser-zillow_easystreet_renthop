@@ -89,5 +89,11 @@ class TelegramBot:
     def start_the_bot(self):
         print("Starting the bot...")
         print("Now polling...")
-        self.bot.run_polling(poll_interval=3)
+        self.bot.run_polling(timeout=3)
+
+if __name__ == "__main__":
+    bot = TelegramBot()
+    bot.start_the_bot()
+
+
 
