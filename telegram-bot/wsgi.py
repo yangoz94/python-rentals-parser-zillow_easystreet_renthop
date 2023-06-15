@@ -1,6 +1,4 @@
-from app import bot
+from bot import TelegramBot
 
-if __name__ == '__main__':
-    # Polling
-    print("Now polling...")
-    bot.run()
+bot = TelegramBot()
+bot.start_the_bot()
