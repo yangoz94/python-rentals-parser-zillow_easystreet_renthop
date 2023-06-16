@@ -57,4 +57,4 @@ urllib3
 Werkzeug
 wsproto
 yarl
-zipp=
+zipp
