@@ -1,10 +1,4 @@
 import asyncio
-import os
-import sys
-sys.path.append('../telegrambot')
-from telegrambot.model.TelegramBot import TelegramBot
-
-
 from flask import Flask, request, jsonify, Response
 from models.ListingParser.ListingParser import ListingParser
 from models.SheetsAPI.SheetsAPI import SheetsAPI
@@ -56,18 +50,6 @@ def parse_listing():
 
     except Exception as e:
         return Response(status=500, response='Internal Server Error: {}'.format(str(e)))
-
-
-@app.route(f'/{os.environ["WEBHOOK_KEY"]}', methods=['POST'])
-def handle_webhook(webhook_key):
-    if webhook_key != os.environ["WEBHOOK_KEY"]:
-        return Response(status=403, response="Forbidden")
-
-    update_data = request.get_json()
-    telegram_bot = TelegramBot()
-    telegram_bot.bot.process_update(update_data)
-    return Response(status=200, response="OK")
-
 
 
 if __name__ == '__main__':
