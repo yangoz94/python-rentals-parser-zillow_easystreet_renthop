@@ -1,4 +1,4 @@
-# Parser for listings on zillow, easystreet, renthop.com 
+# Parser for listings on zillow, streeteasy, renthop.com 
 Parses and adds the extracted attributes to the specified google sheets document.  
 
 1. Clone the repository.  
