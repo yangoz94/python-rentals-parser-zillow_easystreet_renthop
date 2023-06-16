@@ -4,6 +4,7 @@ import aiohttp
 import re
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
+import random
 
 
 load_dotenv()
@@ -17,8 +18,14 @@ class ListingParser:
 
     async def fetch_listing_data(self) -> str:
         try:
+            USER_AGENTS = [
+                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_18_3) AppleWebKit/537.34 (KHTML, like Gecko) Chrome/82.0.412.92 Safari/539.36'
+                "Mozilla/5.0 (iPhone; CPU iPhone OS 15_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.2 Mobile/15E148 Safari/604.1",
+                "Mozilla/5.0 (iPad; CPU OS 15_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.2 Mobile/15E148 Safari/604.1",
+                "Mozilla/5.0 (Linux; Android 12; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Mobile Safari/537.36"
+            ]
             headers = {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0"
+                "User-Agent": random.choice(USER_AGENTS),
             }
             async with aiohttp.ClientSession() as session:
                 async with session.get(self.url, headers=headers) as response:
@@ -58,22 +65,31 @@ class ListingParser:
 
                 number_of_rooms_elements = soup.findAll('li', {'class': 'detail_cell'})
                 if len(number_of_rooms_elements) >= 2:
-                    number_of_rooms = number_of_rooms_elements[1].text.strip()[0] + 'BR'
+                    number_of_rooms_element = number_of_rooms_elements[1]
+                    if number_of_rooms_element:
+                        number_of_rooms_text = number_of_rooms_element.text.strip()
+                        if number_of_rooms_text:
+                            number_of_rooms = number_of_rooms_text[0] + 'BR'
 
                 price_element = soup.find('div', {'class': 'price'})
                 if price_element:
                     price_text = price_element.text.strip()
                     price_pattern = r"\$(\d{1,3}(?:,\d{3})*)(?:\.\d{2})?"
                     match = re.search(price_pattern, price_text)
-                    price = match.group(1) if match else None
+                    if match:
+                        price = match.group(1)
+                    else:
+                        price = None
 
                 description_element = soup.find('div', {'id': 'full-content'})
                 if description_element:
                     description = description_element.text.strip().replace('\n', ' ')
 
-                neighborhood_elements = soup.find('ul', {'class': 'Breadcrumb Breadcrumb--detailsPage'}).find_all('li')
-                if len(neighborhood_elements) >= 3:
-                    neighborhood = neighborhood_elements[2].text.strip()
+                neighborhood_elements = soup.find('ul', {'class': 'Breadcrumb Breadcrumb--detailsPage'})
+                if neighborhood_elements:
+                    neighborhood_elements = neighborhood_elements.find_all('li')
+                    if len(neighborhood_elements) >= 3:
+                        neighborhood = neighborhood_elements[2].text.strip()
 
                 available_on_element = soup.find('div', {'class': 'Vitals-data'})
                 if available_on_element:
