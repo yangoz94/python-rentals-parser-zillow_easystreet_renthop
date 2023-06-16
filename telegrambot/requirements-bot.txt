@@ -1,4 +1,4 @@
-aiohttp==3.8.4
+aiohttp
 aiosignal==1.3.1
 anyio==3.7.0
 asgiref==3.7.2
@@ -13,15 +13,15 @@ certifi==2023.5.7
 charset-normalizer==3.1.0
 click==8.1.3
 exceptiongroup==1.1.1
-Flask
+Flask==2.3.2
 frozenlist==1.3.3
 google-api-core==2.11.0
 google-api-python-client==2.89.0
-google-auth==2.20.0
+google-auth
 google-auth-httplib2==0.1.0
 google-auth-oauthlib==1.0.0
 googleapis-common-protos==1.59.1
-gunicorn
+gunicorn==20.1.0
 h11==0.14.0
 httpcore==0.17.2
 httplib2==0.22.0
@@ -48,6 +48,7 @@ six==1.16.0
 sniffio==1.3.0
 sortedcontainers==2.4.0
 soupsieve==2.4.1
+tornado==6.3.2
 trio==0.22.0
 trio-websocket==0.10.3
 typing_extensions==4.6.3
@@ -56,4 +57,4 @@ urllib3
 Werkzeug
 wsproto
 yarl
-zipp
+zipp=

@@ -32,8 +32,9 @@ class TelegramBot:
             await update.message.reply_text("You are not authorized to use this bot. Sorry :(")
 
     async def help_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        await update.message.reply_text("I am a bot programmed to help with apartment search in NYC, BUT only if you are "
-                                        "an authorized user. For example, /add https://streeteasy.com/rental/1234567")
+        await update.message.reply_text(
+            "I am a bot programmed to help with apartment search in NYC, BUT only if you are "
+            "an authorized user. For example, /add https://streeteasy.com/rental/1234567")
 
     async def add_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not self.check_authorization(update):
@@ -63,7 +64,8 @@ class TelegramBot:
             headers = {
                 'Content-Type': 'application/json',
             }
-            api_response = requests.post(f'{os.getenv("BASE_URL")}/api/parse-listing', json={'url': url}, headers=headers)
+            api_response = requests.post(f'{os.getenv("BASE_URL")}/api/parse-listing', json={'url': url},
+                                         headers=headers)
             if api_response.status_code == 200:
                 parsed_data = api_response.json()
                 formatted_data = json.dumps(parsed_data, indent=4)
@@ -89,5 +91,14 @@ class TelegramBot:
 
     def start_the_bot(self):
         print("Starting the bot...")
-        print("Now polling...")
-        self.bot.run_polling(timeout=3)
+
+        # Set up webhook
+        webhook_key = os.environ["WEBHOOK_KEY"]
+
+        # Set up webhook URL
+        webhook_url = f"{os.getenv('BASE_URL')}/{webhook_key}"
+        print(webhook_url)
+
+        # Set up webhook
+        self.bot.run_webhook(webhook_url)
+
