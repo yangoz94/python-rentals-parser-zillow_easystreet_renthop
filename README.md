@@ -22,7 +22,8 @@ Note that;
 - adding chat_id to ```TELEGRAM_BOT_CHAT_IDS``` list is crucial; otherwise, the bot will respond with ```You are not authorized to use the bot``` message.
 
 # Demo  
-![Screen_Recording_2023-06-30_at_1_49_51_PM_AdobeExpress](https://github.com/yangoz94/python-rentals-parser-zillow_streeteasy_renthop/assets/95255319/15ea97d9-50bd-42dc-8c23-1ef508e623be)
+![demo3](https://github.com/yangoz94/python-rentals-parser-zillow_streeteasy_renthop/assets/95255319/c7293f88-bdc8-47e7-9bc8-f1eecfb03c05)
+
 
 
    
