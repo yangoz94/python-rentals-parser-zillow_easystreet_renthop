@@ -19,7 +19,12 @@ Parses and adds the extracted attributes to the specified google sheets document
 
 Note that;  
 - any changes in HTML code of zillow, streeteasy and renthop might cause returning null values in the future.  
-- adding chat_id to ```TELEGRAM_BOT_CHAT_IDS``` list is crucial; otherwise, the bot will respond with ```You are not authorized to use the bot``` message.  
+- adding chat_id to ```TELEGRAM_BOT_CHAT_IDS``` list is crucial; otherwise, the bot will respond with ```You are not authorized to use the bot``` message.
+
+# Demo  
+![Screen_Recording_2023-06-30_at_1_49_51_PM_AdobeExpress](https://github.com/yangoz94/python-rentals-parser-zillow_streeteasy_renthop/assets/95255319/15ea97d9-50bd-42dc-8c23-1ef508e623be)
+
+
    
 
 
